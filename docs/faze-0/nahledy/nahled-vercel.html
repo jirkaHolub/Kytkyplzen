@@ -1,0 +1,683 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:,">
+<meta name="robots" content="noindex">
+<title>Kytky Plzeň, náhled fáze 0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Caveat:wght@500;700&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<style>
+/* Layout: a phone-sized app frame on a quiet page; six screens switched by hash. */
+:root{
+  --pg-bg:#F3EEF1; --pg-fg:#2B1E27; --pg-muted:#7A6A73; --pg-line:#E2D3DB; --pg-card:#FFFFFF;
+  /* app palette (direction A, committed single look: brand pink on warm white) */
+  --bg:#FFFBFD; --card:#FFFFFF; --blush:#FFE9F4; --blush-2:#FFD6EA;
+  --brand:#E06C9F; --brand-strong:#C44A84; --brand-text:#B23D76; --brand-soft:#FF92D5;
+  --ink:#2B1E27; --muted:#7D6C76; --line:#F0DCE7; --line-2:#E7C9D9;
+  --ok:#2E8B57; --ok-bg:#E6F5EC; --warn:#C27A12; --warn-bg:#FFF1DC; --danger:#D23F5B; --danger-bg:#FDE7EB;
+  --info-bg:#EAF2FF; --info:#2E5AAC;
+  --font:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif; --script:'Caveat','Segoe Script',cursive;
+  --r:18px; --r-s:12px; --tap:48px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){ --pg-bg:#1B1519; --pg-fg:#F4E9EF; --pg-muted:#B59DAA; --pg-line:#3A2C34; --pg-card:#241C21; color-scheme:dark } }
+:root[data-theme="dark"]{ --pg-bg:#1B1519; --pg-fg:#F4E9EF; --pg-muted:#B59DAA; --pg-line:#3A2C34; --pg-card:#241C21; color-scheme:dark }
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--pg-bg);color:var(--pg-fg);font-family:var(--font);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+img{max-width:100%;display:block}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.15}
+
+.sw-dir{display:flex;gap:4px;background:var(--pg-card);border:1px solid var(--pg-line);border-radius:999px;padding:3px}
+.sw-dir button{border:0;background:transparent;border-radius:999px;padding:6px 12px;font-weight:800;font-size:13px;color:var(--pg-muted)}
+.sw-dir button.on{background:var(--pg-fg);color:var(--pg-bg)}
+/* ---------- page chrome (outside the phone) ---------- */
+.chrome{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--pg-bg);border-bottom:1px solid var(--pg-line);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--pg-bg)}
+.chrome-in{max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.chrome-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.chrome-top strong{font-weight:800;font-size:15px}
+.chrome-top span{color:var(--pg-muted);font-size:13px}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{flex:0 0 auto;text-decoration:none;color:var(--pg-fg);background:var(--pg-card);border:1px solid var(--pg-line);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:700;white-space:nowrap}
+.tabs a.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.tabs a small{opacity:.65;font-weight:600;margin-right:4px}
+
+.stage{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 28px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.note{max-width:420px;color:var(--pg-muted);font-size:13px;text-align:center}
+.phone{width:100%;max-width:400px;background:var(--bg);color:var(--ink);position:relative;overflow:hidden}
+@media (min-width:640px){
+  .phone{border-radius:40px;border:8px solid #1E1A1D;height:844px;box-shadow:0 30px 60px -20px rgba(43,30,39,.45)}
+  .screen.on{height:100%;overflow-y:auto;overscroll-behavior:contain}
+}
+.screen{display:none;flex-direction:column;min-height:100%}
+.screen.on{display:flex}
+.screen>*{flex-shrink:0}
+.screen>.grow{flex:1 0 auto}
+
+/* ---------- shared app components ---------- */
+.gut{padding-left:16px;padding-right:16px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px 8px;background:var(--bg);position:sticky;top:0;z-index:5}
+.logo{font-family:var(--script);font-size:30px;font-weight:700;color:var(--brand);line-height:1;letter-spacing:.2px}
+.logo small{display:block;font-family:var(--font);font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:2px}
+.iconbtn{width:var(--tap);height:var(--tap);border-radius:50%;border:1px solid var(--line-2);background:var(--card);display:inline-flex;align-items:center;justify-content:center;position:relative}
+.iconbtn .dot{position:absolute;top:8px;right:8px;width:10px;height:10px;border-radius:50%;background:var(--brand);border:2px solid #fff}
+.back{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--brand-text);text-decoration:none;min-height:var(--tap)}
+.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:4px 16px 10px}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;min-height:40px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line-2);background:var(--card);font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+.chip.on{background:var(--brand);border-color:var(--brand);color:#fff}
+.chip.off{color:var(--muted);text-decoration:line-through;background:transparent}
+.chip.off.full{text-decoration:none;color:var(--muted);border-style:dashed}
+.chip .sub{font-weight:600;font-size:12px;opacity:.8}
+.sec{padding:14px 16px 6px;display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.sec h2{font-size:19px;font-weight:800}
+.sec .hand{font-family:var(--script);font-size:24px;color:var(--brand-text);font-weight:500}
+.sec a,.link{color:var(--brand-text);font-weight:700;text-decoration:none;font-size:14px}
+.strip{margin:6px 16px 4px;background:var(--blush);border-radius:var(--r);padding:12px 14px;display:flex;gap:12px;align-items:center;font-size:14px}
+.strip .ic{width:40px;height:40px;border-radius:12px;background:#fff;display:grid;place-items:center;flex:0 0 auto}
+.strip b{font-weight:800}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:6px 16px}
+.pcard{background:var(--card);border-radius:var(--r);overflow:hidden;border:1px solid var(--line);text-decoration:none;color:inherit;display:flex;flex-direction:column;position:relative}
+.pcard .ph{aspect-ratio:4/5;overflow:hidden;background:var(--blush)}
+.pcard img{width:100%;height:100%;object-fit:cover}
+.pcard .b{padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px}
+.pcard .n{font-weight:800;font-size:14px}
+.pcard .p{font-weight:800;font-size:16px;color:var(--brand-text)}
+.pcard .m{font-size:12px;color:var(--muted)}
+.badge{position:absolute;top:10px;left:10px;background:#fff;border-radius:999px;padding:4px 10px;font-size:11px;font-weight:800;letter-spacing:.02em;box-shadow:0 2px 8px rgba(43,30,39,.12)}
+.badge.last{color:var(--warn)}
+.badge.sold{color:var(--muted)}
+.pcard.sold .ph{filter:grayscale(.6) opacity(.7)}
+.tiers{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:6px 16px 4px}
+.tiers::-webkit-scrollbar{display:none}
+.tier{flex:0 0 150px;background:linear-gradient(160deg,var(--blush),#fff 70%);border:1.5px dashed var(--line-2);border-radius:var(--r);padding:14px 12px;display:flex;flex-direction:column;gap:4px;text-decoration:none;color:inherit;min-height:120px}
+.tier .hand{font-family:var(--script);font-size:22px;color:var(--brand-text)}
+.tier .p{font-size:20px;font-weight:800}
+.tier .m{font-size:12px;color:var(--muted)}
+.row{display:flex;align-items:center;gap:12px}
+.space{justify-content:space-between}
+.bottomnav{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,1fr);padding:6px 8px calc(8px + env(safe-area-inset-bottom,0px));z-index:5}
+.bottomnav a{text-decoration:none;color:var(--muted);font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:var(--tap);justify-content:center;border-radius:12px}
+.bottomnav a.on{color:var(--brand-text);background:var(--blush)}
+.bottomnav svg{width:22px;height:22px}
+.btn{min-height:52px;border-radius:16px;border:0;background:var(--brand);color:#fff;font-weight:800;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:0 18px;width:100%;text-decoration:none}
+.btn.sec-btn{background:var(--blush);color:var(--brand-text)}
+.btn.ghost{background:#fff;border:1.5px solid var(--line-2);color:var(--ink)}
+.btn.dark{background:#111;color:#fff}
+.btn.ok{background:var(--ok)}
+.btn .amt{margin-left:auto;opacity:.95}
+.cta{position:sticky;bottom:0;background:linear-gradient(180deg,rgba(255,251,253,0),var(--bg) 30%);padding:10px 16px calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;z-index:5}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;display:flex;flex-direction:column;gap:10px;margin:0 16px 12px}
+.card h3{font-size:15px;font-weight:800;display:flex;align-items:center;gap:8px}
+.card h3 .num{width:24px;height:24px;border-radius:50%;background:var(--blush-2);color:var(--brand-text);font-size:12px;display:grid;place-items:center}
+.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--blush);border-radius:14px;padding:4px;gap:4px}
+.seg button{min-height:44px;border:0;border-radius:11px;background:transparent;font-weight:800;color:var(--brand-text)}
+.seg button.on{background:#fff;box-shadow:0 1px 4px rgba(43,30,39,.12);color:var(--ink)}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.input{min-height:var(--tap);border:1.5px solid var(--line-2);border-radius:14px;padding:10px 14px;background:#fff;display:flex;align-items:center;gap:8px;width:100%}
+.input.ta{min-height:92px;align-items:flex-start}
+textarea.input{resize:none}
+.input::placeholder{color:#B5A5AE}
+.sugg{border:1.5px solid var(--line-2);border-top:0;border-radius:0 0 14px 14px;margin-top:-10px;background:#fff;overflow:hidden}
+.sugg div{padding:12px 14px;border-top:1px solid var(--line);font-size:14px}
+.sugg div b{font-weight:800}
+.kv{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.kv.total{font-weight:800;font-size:17px;border-top:1px solid var(--line);padding-top:10px}
+.kv .mut{color:var(--muted)}
+.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:800}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.info{background:var(--info-bg);color:var(--info)}
+.pill.pink{background:var(--blush-2);color:var(--brand-text)}
+.pill.gray{background:#F1EBEE;color:var(--muted)}
+.pill.danger{background:var(--danger-bg);color:var(--danger)}
+.opt{display:flex;align-items:center;gap:12px;min-height:var(--tap);padding:8px 12px;border:1.5px solid var(--line-2);border-radius:14px;background:#fff}
+.opt.on{border-color:var(--brand);background:var(--blush)}
+.opt .rad{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);flex:0 0 auto;display:grid;place-items:center}
+.opt.on .rad{border-color:var(--brand)}
+.opt.on .rad::after{content:"";width:12px;height:12px;border-radius:50%;background:var(--brand)}
+.opt .t{flex:1;font-weight:700;font-size:14px}
+.opt .t small{display:block;font-weight:600;color:var(--muted);font-size:12px}
+.opt .pr{font-weight:800;font-size:14px}
+.addons{display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:2px 0 4px}
+.addons::-webkit-scrollbar{display:none}
+.addon{flex:0 0 118px;border:1.5px solid var(--line-2);border-radius:14px;padding:10px;background:#fff;display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:700}
+.addon .em{font-size:26px}
+.addon .pr{font-weight:800;color:var(--brand-text)}
+.addon.on{border-color:var(--brand);background:var(--blush)}
+.toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:var(--tap);font-weight:700;font-size:14px}
+.sw{width:50px;height:30px;border-radius:999px;background:#E8DCE3;position:relative;flex:0 0 auto;border:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:left .15s}
+.sw.on{background:var(--brand)}
+.sw.on::after{left:23px}
+.counter{font-size:12px;color:var(--muted);text-align:right}
+.hint{font-size:12px;color:var(--muted)}
+.demo{font-size:11px;color:var(--muted);background:#F7F1F4;border-radius:8px;padding:6px 10px;display:inline-block}
+.stepper{display:inline-flex;align-items:center;border:1.5px solid var(--line-2);border-radius:14px;overflow:hidden;background:#fff}
+.stepper button{width:var(--tap);height:var(--tap);border:0;background:transparent;font-size:22px;font-weight:700;color:var(--brand-text)}
+.stepper span{min-width:40px;text-align:center;font-weight:800;font-size:18px}
+.bigin{font-size:34px;font-weight:800;min-height:64px;text-align:right;letter-spacing:-.02em}
+.photo-tile{aspect-ratio:4/3;border-radius:var(--r);border:2px dashed var(--brand-soft);background:var(--blush);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--brand-text);font-weight:800;margin:0 16px 12px;position:relative;overflow:hidden}
+.photo-tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.photo-tile .ov{position:relative;z-index:1;background:rgba(255,255,255,.9);border-radius:12px;padding:8px 12px;font-size:13px}
+.ocard{background:#fff;border:1px solid var(--line);border-radius:var(--r);margin:0 16px 10px;overflow:hidden}
+.ocard .hd{display:flex;gap:10px;padding:10px 12px;align-items:center}
+.ocard .th{width:56px;height:56px;border-radius:12px;object-fit:cover;flex:0 0 auto;background:var(--blush)}
+.ocard .ti{flex:1;min-width:0}
+.ocard .ti b{display:block;font-weight:800;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ocard .hd .pill{flex:0 0 auto}
+.ocard .ti span{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ocard .act{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;padding:0 10px 10px}
+.ocard .act .btn{min-height:44px;font-size:13px;border-radius:12px;padding:0 10px}
+.slot-h{display:flex;align-items:center;gap:10px;padding:12px 16px 6px;font-weight:800;font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.slot-h .ln{flex:1;height:1px;background:var(--line-2)}
+.stat{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:4px 16px 10px}
+.stat div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px;font-weight:800;font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--muted);font-weight:700}
+.toast{margin:8px 16px 4px;background:#1E1A1D;color:#fff;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700}
+.toast .pulse{width:10px;height:10px;border-radius:50%;background:var(--brand-soft);box-shadow:0 0 0 4px rgba(255,146,213,.35)}
+.toast a{color:var(--brand-soft);margin-left:auto;text-decoration:none;white-space:nowrap}
+.admin-top{background:var(--brand);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:5}
+.admin-top .row{justify-content:space-between}
+.admin-top h1{font-size:20px;font-weight:800}
+.admin-top .sub{font-size:13px;opacity:.9}
+.admin-top .iconbtn{background:rgba(255,255,255,.18);border-color:transparent;color:#fff}
+.adminnav{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(8px + env(safe-area-inset-bottom,0px));z-index:5}
+.adminnav a{text-decoration:none;color:var(--muted);font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px;min-height:var(--tap);justify-content:center;border-radius:12px}
+.adminnav a.on{color:var(--brand-text);background:var(--blush)}
+.adminnav a.plus span{width:40px;height:40px;border-radius:50%;background:var(--brand);color:#fff;display:grid;place-items:center;font-size:24px;line-height:1;margin-top:-18px;box-shadow:0 6px 14px rgba(224,108,159,.45)}
+.gallery{position:relative;background:var(--blush)}
+.gallery img{width:100%;aspect-ratio:1;object-fit:cover}
+.gallery .dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:5px}
+.gallery .dots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.6)}
+.gallery .dots i.on{background:#fff;width:16px;border-radius:3px}
+.gallery .back{position:absolute;top:12px;left:12px;background:#fff;border-radius:999px;padding:0 14px 0 10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+.gallery .fav{position:absolute;top:12px;right:12px}
+.price-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding:14px 16px 4px}
+.price-row h1{font-size:22px;font-weight:800}
+.price-row .p{font-size:24px;font-weight:800;color:var(--brand-text);white-space:nowrap}
+.meta{padding:4px 16px 8px;display:flex;flex-wrap:wrap;gap:6px}
+.desc{padding:4px 16px 10px;color:var(--ink);font-size:14px}
+.avail{margin:4px 16px 10px;border-radius:14px;background:var(--ok-bg);color:var(--ok);padding:10px 12px;font-size:13px;font-weight:700;display:flex;gap:10px;align-items:center}
+.paylogo{display:flex;align-items:center;justify-content:center;gap:10px;padding:18px 16px 6px}
+.paylogo .logo{font-size:34px}
+.hero-ig{margin:0 16px 12px;border-radius:var(--r);overflow:hidden;position:relative;aspect-ratio:4/3;background:var(--blush)}
+.hero-ig img{width:100%;height:100%;object-fit:cover}
+.hero-ig .cap{position:absolute;left:12px;bottom:12px;background:rgba(255,255,255,.92);border-radius:12px;padding:8px 12px;font-size:13px;font-weight:700}
+.timer{margin:0 16px 12px;border-radius:14px;background:var(--warn-bg);color:var(--warn);padding:10px 12px;font-weight:800;font-size:13px;display:flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.apay{min-height:52px;border-radius:16px;background:#000;color:#fff;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:0}
+.gpay{min-height:52px;border-radius:16px;background:#fff;color:#111;font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;gap:6px;width:100%;border:1.5px solid #ddd}
+.or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;font-weight:700;margin:4px 0}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line-2)}
+.foot{padding:18px 16px 24px;color:var(--muted);font-size:12px;text-align:center;line-height:1.6}
+:focus-visible{outline:3px solid var(--brand-soft);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important} }
+body.tb{--pg-bg:#ECEBE6; --pg-fg:#1C2520; --pg-muted:#6D746F; --pg-line:#D8D7CF; --pg-card:#FFFFFF; --bg:#F5F4F0; --card:#FFFFFF; --blush:#F4E7EC; --blush-2:#ECD3DD; --brand:#2F5C44; --brand-strong:#24483500; --brand-text:#2F5C44; --brand-soft:#E9A9C4; --rose:#C94C83; --ink:#1C2520; --muted:#6D746F; --line:#E6E5DF; --line-2:#D3D2C9; --ok:#2F6F4E; --ok-bg:#E4F0E8; --warn:#A96A0B; --warn-bg:#F7ECD6; --danger:#B9324F; --danger-bg:#F6E1E6; --info-bg:#E6ECF5; --info:#2E4C8A; --font:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif; --script:'Fraunces',Georgia,'Times New Roman',serif; --display:'Fraunces',Georgia,serif; --r:10px; --r-s:6px; --tap:48px;}
+body.tb .phone{border-color:#1C2520}
+body.tb{font-size:15px}
+body.tb .phone{box-shadow:none}
+body.tb .phone{border-color:#1C2520}
+body.tb .logo{font-family:var(--display);font-weight:300;font-style:italic;font-size:28px;color:var(--ink);letter-spacing:-.01em}
+body.tb .logo small{letter-spacing:.18em;color:var(--rose)}
+body.tb .topbar{border-bottom:1px solid var(--line)}
+body.tb .iconbtn{border-radius:10px;border-color:var(--line-2)}
+body.tb .chip{border-radius:6px;border-color:var(--line-2);font-weight:700;font-size:13px;letter-spacing:.01em}
+body.tb .chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+body.tb .strip{background:var(--ink);color:#F5F4F0;border-radius:var(--r)}
+body.tb .strip .ic{background:rgba(255,255,255,.1)}
+body.tb .strip .demo{background:rgba(255,255,255,.12);color:#F5F4F0}
+body.tb .sec h2{font-family:var(--display);font-weight:400;font-size:26px;letter-spacing:-.01em}
+body.tb .sec .hand, body.tb .tier .hand{font-family:var(--display);font-style:italic;font-weight:300;font-size:22px;color:var(--rose)}
+body.tb .sec a, body.tb .link{color:var(--rose);text-transform:uppercase;font-size:11px;letter-spacing:.12em}
+body.tb #s-uvod .grid.feat{grid-template-columns:1fr;gap:18px}
+body.tb #s-uvod .grid.feat .pcard .ph{aspect-ratio:1}
+body.tb #s-uvod .grid.feat .pcard .n{font-family:var(--display);font-weight:400;font-size:22px}
+body.tb #s-uvod .grid.feat .pcard .b{flex-direction:row;flex-wrap:wrap;align-items:baseline;justify-content:space-between;padding:12px 2px 0}
+body.tb #s-uvod .grid.feat .pcard .m{flex-basis:100%}
+body.tb .pcard{border:0;background:transparent;border-radius:0}
+body.tb .pcard .ph{border-radius:var(--r)}
+body.tb .pcard .b{padding:10px 2px 6px}
+body.tb .pcard .n{font-weight:600}
+body.tb .pcard .p{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+body.tb .badge{border-radius:4px;text-transform:uppercase;letter-spacing:.1em;font-size:10px;box-shadow:none;background:var(--ink);color:#fff}
+body.tb .badge.last{background:var(--rose);color:#fff}
+body.tb .badge.sold{background:#fff;color:var(--muted)}
+body.tb .tier{background:#fff;border:1px solid var(--line-2);border-radius:var(--r)}
+body.tb .tier .p{font-family:var(--display);font-weight:400;font-size:24px}
+body.tb .btn{border-radius:10px;font-weight:700;font-size:15px;letter-spacing:.02em}
+body.tb .btn.sec-btn{background:var(--blush);color:var(--ink)}
+body.tb .btn.ghost{border-color:var(--line-2)}
+body.tb .bottomnav a.on, body.tb .adminnav a.on{background:transparent;color:var(--ink);box-shadow:inset 0 2px 0 var(--ink)}
+body.tb .adminnav a.plus span{background:var(--rose);box-shadow:0 6px 14px rgba(201,76,131,.4)}
+body.tb .card{border-radius:var(--r);border-color:var(--line)}
+body.tb .card h3{font-family:var(--font);text-transform:uppercase;letter-spacing:.1em;font-size:11px;color:var(--muted)}
+body.tb .card h3 .num{background:var(--ink);color:#fff}
+body.tb .seg{background:#EEEDE7;border-radius:10px}
+body.tb .seg button{border-radius:7px;color:var(--muted)}
+body.tb .seg button.on{color:var(--ink)}
+body.tb .input{border-radius:8px}
+body.tb .sugg{border-radius:0 0 8px 8px}
+body.tb .opt{border-radius:8px}
+body.tb .opt.on{border-color:var(--ink);background:#fff}
+body.tb .opt.on .rad{border-color:var(--ink)}
+body.tb .opt.on .rad::after{background:var(--ink)}
+body.tb .addon{border-radius:8px}
+body.tb .addon.on{border-color:var(--ink);background:#fff}
+body.tb .addon .pr{color:var(--ink)}
+body.tb .sw.on{background:var(--ink)}
+body.tb .pill{border-radius:4px;text-transform:uppercase;letter-spacing:.08em;font-size:10px}
+body.tb .pill.pink{background:var(--blush);color:var(--rose)}
+body.tb .price-row h1{font-family:var(--display);font-weight:400;font-size:28px}
+body.tb .price-row .p{color:var(--ink);font-family:var(--display);font-weight:400;font-size:26px}
+body.tb .gallery img{aspect-ratio:4/5}
+body.tb .gallery .back{border-radius:6px}
+body.tb .admin-top{background:var(--ink);color:#F5F4F0}
+body.tb .admin-top h1{font-family:var(--display);font-weight:400;font-size:22px}
+body.tb .admin-top .iconbtn{border-radius:10px}
+body.tb .toast{background:var(--rose);border-radius:var(--r)}
+body.tb .toast .pulse{background:#fff;box-shadow:0 0 0 4px rgba(255,255,255,.3)}
+body.tb .toast a{color:#fff;text-decoration:underline}
+body.tb .slot-h{font-size:11px;letter-spacing:.12em}
+body.tb .ocard{border-radius:var(--r)}
+body.tb .ocard .th{border-radius:6px}
+body.tb .stat div{border-radius:var(--r)}
+body.tb .stat b{font-family:var(--display);font-weight:400;font-size:24px}
+body.tb .photo-tile{border-radius:var(--r);border-color:var(--line-2);background:#EEEDE7;color:var(--ink)}
+body.tb .photo-tile .ov{border-radius:8px}
+body.tb .hero-ig{border-radius:var(--r)}
+body.tb .hero-ig .cap{border-radius:6px}
+body.tb .timer{border-radius:8px}
+body.tb .apay, body.tb .gpay{border-radius:10px}
+body.tb .avail{border-radius:8px}
+body.tb .tabs a.on{background:var(--ink);border-color:var(--ink)}
+body.tb :focus-visible{outline-color:var(--rose)}
+
+</style>
+
+<div class="chrome">
+  <div class="chrome-in">
+    <div class="chrome-top">
+      <strong id="dirname">Kytky Plzeň · směr A „Pastel“</strong>
+      <div class="sw-dir" role="group" aria-label="Vizuální směr"><button id="dA" class="on">A Pastel</button><button id="dB">B Ateliér</button></div>
+      <span>Klikatelný statický náhled, fáze 0. Hodnoty cen a časů jsou ukázkové.</span>
+    </div>
+    <nav class="tabs" id="tabs">
+      <a href="#uvod"><small>a</small>Úvod a denní nabídka</a>
+      <a href="#detail"><small>b</small>Detail kytice</a>
+      <a href="#objednavka"><small>c</small>Objednávka</a>
+      <a href="#platba"><small>d</small>Platební odkaz</a>
+      <a href="#admin-nova"><small>e</small>Admin: nová kytice</a>
+      <a href="#admin-den"><small>f</small>Admin: objednávky dne</a>
+    </nav>
+  </div>
+</div>
+
+<main class="stage">
+<div class="phone" id="phone">
+
+<!-- ============ a) ÚVOD ============ -->
+<section class="screen" id="s-uvod">
+  <header class="topbar">
+    <div class="logo">Kytky Plzeň<small>Květiny až ke dveřím</small></div>
+    <div class="row" style="gap:8px">
+      <a class="iconbtn" href="#platba" aria-label="Účet"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></a>
+      <a class="iconbtn" href="#objednavka" aria-label="Košík"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 4h2l2 12h11l2-8H6"/><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/></svg><span class="dot"></span></a>
+    </div>
+  </header>
+  <div class="chips" data-group>
+    <button class="chip on">Obě prodejny</button>
+    <button class="chip">Sedláčkova 9</button>
+    <button class="chip">Paluba Hamburk</button>
+  </div>
+  <div class="strip">
+    <div class="ic">🚕</div>
+    <div>Dnes rozvážíme <b>do 18:00</b>. Objednávky na dnešek přijímáme <b>do 15:00</b>. <span class="demo">ukázka</span></div>
+  </div>
+
+  <div class="sec"><h2>Dnes v nabídce <span class="hand">čt 19. 11.</span></h2><a href="#detail">Vše (14)</a></div>
+  <div class="grid feat">
+    <a class="pcard" href="#detail"><span class="badge last">Poslední kus</span><div class="ph"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8475_kytka-207.jpg" alt=""></div><div class="b"><span class="n">Pudrová hortenzie</span><span class="p">510 Kč</span><span class="m">Sedláčkova · dnes od 14:00</span></div></a>
+    <a class="pcard" href="#detail"><div class="ph"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8484_kytka-210.jpg" alt=""></div><div class="b"><span class="n">Bílé gerbery a hortenzie</span><span class="p">899 Kč</span><span class="m">Hamburk · 2 ks</span></div></a>
+    <a class="pcard" href="#detail"><div class="ph"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8487_kytka-211.jpg" alt=""></div><div class="b"><span class="n">Fialové chryzantémy</span><span class="p">295 Kč</span><span class="m">Sedláčkova · 3 ks</span></div></a>
+    <a class="pcard" href="#detail"><div class="ph"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8481_kytka-209.jpg" alt=""></div><div class="b"><span class="n">Růžová s eustomou</span><span class="p">565 Kč</span><span class="m">Hamburk · 1 ks</span></div></a>
+    <a class="pcard" href="#detail"><div class="ph"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8457_kytka-202202.jpg" alt=""></div><div class="b"><span class="n">Červená romantika</span><span class="p">875 Kč</span><span class="m">Sedláčkova · 2 ks</span></div></a>
+    <a class="pcard sold" href="#detail"><span class="badge sold">Vyprodáno</span><div class="ph"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8469_kytka-205.jpg" alt=""></div><div class="b"><span class="n">Modrý košík</span><span class="p">700 Kč</span><span class="m">Hamburk</span></div></a>
+  </div>
+
+  <div class="sec"><h2>Nechám to na floristce</h2><span class="hand">my to uvážeme</span></div>
+  <div class="tiers">
+    <a class="tier" href="#objednavka"><span class="hand">Kytice</span><span class="p">1 000 Kč</span><span class="m">barvy a styl vyberete v objednávce</span></a>
+    <a class="tier" href="#objednavka"><span class="hand">Větší kytice</span><span class="p">1 500 Kč</span><span class="m">nejčastější volba</span></a>
+    <a class="tier" href="#objednavka"><span class="hand">Velká kytice</span><span class="p">2 000 Kč</span><span class="m">na oslavu i výročí</span></a>
+    <a class="tier" href="#objednavka"><span class="hand">Vlastní částka</span><span class="p">od 600 Kč</span><span class="m">zadáte sami</span></a>
+  </div>
+
+  <div class="sec"><h2>Růže na kusy</h2><a href="#detail">Ceník</a></div>
+  <div class="grid">
+    <a class="pcard" href="#detail"><div class="ph" style="aspect-ratio:4/3"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8460_kytka-203203.jpg" alt=""></div><div class="b"><span class="n">Růže Ekvádor 70 cm</span><span class="p">od 95 Kč / ks</span><span class="m">červená, bílá, pudrová</span></div></a>
+    <a class="pcard" href="#detail"><div class="ph" style="aspect-ratio:4/3"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8463_kytka-204204.jpg" alt=""></div><div class="b"><span class="n">Růže Mondial 70 cm</span><span class="p">od 110 Kč / ks</span><span class="m">bílá</span></div></a>
+  </div>
+
+  <div class="sec"><h2>Prémiové na předobjednávku</h2><span class="pill warn">min. 5 dní předem</span></div>
+  <div class="grid">
+    <a class="pcard" href="#detail"><div class="ph"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8478_kytka-208.jpg" alt=""></div><div class="b"><span class="n">51 ekvádorských růží</span><span class="p">4 900 Kč</span><span class="m">nejdříve út 25. 11.</span></div></a>
+    <a class="pcard" href="#detail"><div class="ph"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8472_kytka-206.jpg" alt=""></div><div class="b"><span class="n">Svatební kytice</span><span class="p">od 2 000 Kč</span><span class="m">po konzultaci</span></div></a>
+  </div>
+
+  <div class="foot">Kytky Plzeň s.r.o. · Sedláčkova 191/9 a Paluba Hamburk, Plzeň<br>Po–Ne 8–18 · +420 732 466 589 · @kytky_plzen</div>
+
+  <nav class="bottomnav">
+    <a class="on" href="#uvod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c2 4 6 5 6 10a6 6 0 0 1-12 0c0-5 4-6 6-10z"/><path d="M12 13v8"/></svg>Nabídka</a>
+    <a href="#objednavka"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Objednat</a>
+    <a href="#uvod"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s7-6 7-12a7 7 0 0 0-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>Prodejny</a>
+    <a href="#platba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>Účet</a>
+  </nav>
+</section>
+
+<!-- ============ b) DETAIL ============ -->
+<section class="screen" id="s-detail">
+  <div class="gallery">
+    <img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8475_kytka-207.jpg" alt="Pudrová hortenzie">
+    <a class="back" href="#uvod">‹ Nabídka</a>
+    <button class="iconbtn fav" aria-label="Uložit">♡</button>
+    <div class="dots"><i class="on"></i><i></i><i></i></div>
+  </div>
+  <div class="price-row"><h1>Pudrová hortenzie</h1><span class="p">510 Kč</span></div>
+  <div class="meta"><span class="pill pink">Hotová kytice</span><span class="pill warn">Poslední kus</span><span class="pill gray">Sedláčkova 9</span></div>
+  <div class="avail">⏱ Nejdříve <b>dnes 14–16 h</b> rozvozem, nebo odběr na Sedláčkově od 13:00</div>
+  <p class="desc">Hortenzie, tulipán, trsová růže a frézie v pudrově růžovém papíru. Kytice na fotce je přesně ta, kterou dostanete. Výška asi 45 cm.</p>
+
+  <div class="card">
+    <h3>Balení</h3>
+    <div data-group>
+      <label class="opt on"><span class="rad"></span><span class="t">Papír v barvě značky<small>růžový nebo krémový</small></span><span class="pr">v ceně</span></label>
+      <label class="opt" style="margin-top:8px"><span class="rad"></span><span class="t">Dárková krabice<small>kytice v aquapěně</small></span><span class="pr">+ 150 Kč</span></label>
+      <label class="opt" style="margin-top:8px"><span class="rad"></span><span class="t">Proutěný košík</span><span class="pr">+ 250 Kč</span></label>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Přidat k tomu</h3>
+    <div class="addons" data-group>
+      <button class="addon"><span class="em">🍫</span>Raffaello 80 g<span class="pr">89 Kč</span></button>
+      <button class="addon"><span class="em">🧸</span>Medvídek 30 cm<span class="pr">349 Kč</span></button>
+      <button class="addon"><span class="em">🏺</span>Váza skleněná<span class="pr">299 Kč</span></button>
+      <button class="addon"><span class="em">💌</span>Kartička se vzkazem<span class="pr">zdarma</span></button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Dobré vědět</h3>
+    <div class="kv"><span class="mut">Doprava po Plzni</span><span>od 99 Kč, cena přesně podle adresy</span></div>
+    <div class="kv"><span class="mut">Osobní odběr</span><span>zdarma, obě prodejny</span></div>
+    <div class="kv"><span class="mut">Fotka před odesláním</span><span>na přání pošleme</span></div>
+  </div>
+  <div class="grow"></div>
+  <div class="cta"><a class="btn" href="#objednavka">Objednat <span class="amt">510 Kč</span></a></div>
+</section>
+
+<!-- ============ c) OBJEDNÁVKA ============ -->
+<section class="screen" id="s-objednavka">
+  <header class="topbar">
+    <a class="back" href="#detail">‹ Zpět</a>
+    <strong style="font-weight:800">Objednávka</strong>
+    <span style="width:48px"></span>
+  </header>
+
+  <div class="card">
+    <h3><span class="num">1</span>Jak kytici dostanete</h3>
+    <div class="seg" data-group><button class="on">🚕 Doručení</button><button>🏪 Osobní odběr</button></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="num">2</span>Kdy</h3>
+    <div class="chips" style="padding:0" data-group>
+      <button class="chip on">Dnes<span class="sub">čt 19. 11.</span></button>
+      <button class="chip">Zítra<span class="sub">pá 20. 11.</span></button>
+      <button class="chip">So<span class="sub">21. 11.</span></button>
+      <button class="chip">Ne<span class="sub">22. 11.</span></button>
+      <button class="chip">📅 Jiný den</button>
+    </div>
+    <div class="chips" style="padding:0" data-group>
+      <button class="chip off">10–12</button>
+      <button class="chip off full">12–14 <span class="sub">obsazeno</span></button>
+      <button class="chip on">14–16</button>
+      <button class="chip">16–18 <span class="sub">poslední 2</span></button>
+    </div>
+    <span class="hint">Nabízíme jen sloty, které jsou volné a stihneme je pro všechny položky v košíku.</span>
+  </div>
+
+  <div class="card">
+    <h3><span class="num">3</span>Kam</h3>
+    <div class="field"><label>Adresa doručení</label><div class="input">📍 <span>Klatovská třída 12</span></div>
+      <div class="sugg"><div><b>Klatovská třída 120</b>, Plzeň 3 – Jižní Předměstí</div><div><b>Klatovská třída 12</b>, Plzeň 3 – Jižní Předměstí</div><div><b>Klatovská 12</b>, Starý Plzenec</div></div>
+    </div>
+    <div class="row space" style="background:var(--ok-bg);border-radius:14px;padding:10px 12px">
+      <span style="font-size:13px;font-weight:700;color:var(--ok)">Doprava · 3,4 km po silnici ze Sedláčkovy</span>
+      <span style="font-weight:800;color:var(--ok);white-space:nowrap">149 Kč</span>
+    </div>
+    <span class="hint">Pásmo do 6 km. Cena je konečná a ještě ji ověří server. <span class="demo">ukázkový ceník</span></span>
+  </div>
+
+  <div class="card">
+    <h3><span class="num">4</span>Komu</h3>
+    <div class="toggle">Příjemce je někdo jiný než já<button class="sw on" aria-label="přepnout"></button></div>
+    <div class="field"><label>Jméno příjemce</label><div class="input">Hana Svobodová</div></div>
+    <div class="field"><label>Telefon příjemce</label><div class="input">+420 777 123 456</div></div>
+    <div class="toggle">Zavolat příjemci předem<button class="sw on" aria-label="přepnout"></button></div>
+    <div class="toggle">Poslat anonymně (bez jména odesílatele)<button class="sw" aria-label="přepnout"></button></div>
+    <div class="field"><label>Poznámka pro řidiče</label><div class="input">3. patro, zvonek Svobodovi</div></div>
+  </div>
+
+  <div class="card">
+    <h3><span class="num">5</span>Vzkaz na kartičku</h3>
+    <div class="chips" style="padding:0" data-group><button class="chip on">Klasická</button><button class="chip">Narozeniny</button><button class="chip">Výročí</button><button class="chip">Jen tak</button></div>
+    <textarea class="input ta" id="msg" maxlength="150" placeholder="Napište vzkaz, vytiskneme ho na kartičku…">Všechno nejlepší, Hani! Ať je ten rok plný barev. Tvoje Káťa</textarea>
+    <div class="counter"><span id="msgc">63</span>/150 znaků</div>
+  </div>
+
+  <div class="card">
+    <h3><span class="num">6</span>Balení a doplňky</h3>
+    <div data-group>
+      <label class="opt on"><span class="rad"></span><span class="t">Papír v barvě značky</span><span class="pr">v ceně</span></label>
+      <label class="opt" style="margin-top:8px"><span class="rad"></span><span class="t">Dárková krabice</span><span class="pr">+ 150 Kč</span></label>
+    </div>
+    <div class="addons" data-group>
+      <button class="addon on"><span class="em">🍫</span>Raffaello 80 g<span class="pr">89 Kč</span></button>
+      <button class="addon"><span class="em">🧸</span>Medvídek 30 cm<span class="pr">349 Kč</span></button>
+      <button class="addon"><span class="em">🏺</span>Váza<span class="pr">299 Kč</span></button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Souhrn</h3>
+    <div class="row"><img class="ocard th" src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8475_kytka-207.jpg" alt="" style="width:56px;height:56px;border-radius:12px;object-fit:cover"><div style="flex:1"><b style="font-weight:800">Pudrová hortenzie</b><div class="hint">Sedláčkova 9 · dnes 14–16</div></div><b>510 Kč</b></div>
+    <div class="kv"><span class="mut">Raffaello 80 g</span><span>89 Kč</span></div>
+    <div class="kv"><span class="mut">Doprava, 3,4 km</span><span>149 Kč</span></div>
+    <div class="kv"><span class="mut">Věrnostní body (−120 b.)</span><a class="link" href="#platba">Uplatnit</a></div>
+    <div class="kv total"><span>Celkem vč. DPH</span><span>748 Kč</span></div>
+    <div class="field"><label>Váš telefon (potvrzení SMS)</label><div class="input">+420 </div></div>
+    <div class="field"><label>E-mail pro doklad</label><div class="input" style="color:#B5A5AE">jmeno@email.cz</div></div>
+  </div>
+  <div class="grow"></div>
+  <div class="cta"><a class="btn" href="#platba">Zaplatit <span class="amt">748 Kč</span></a></div>
+</section>
+
+<!-- ============ d) PLATEBNÍ ODKAZ ============ -->
+<section class="screen" id="s-platba">
+  <div class="paylogo"><div class="logo">Kytky Plzeň</div></div>
+  <div style="text-align:center;padding:0 16px 12px">
+    <h1 style="font-size:20px;font-weight:800">Objednávka č. 2611-043</h1>
+    <div class="hint">Připravila Nikola podle vaší zprávy na Instagramu (@hanka.sv)</div>
+  </div>
+  <div class="timer">⏳ Odkaz platí do 19:30 · zbývá <span id="tm">1:12:08</span></div>
+  <div class="hero-ig"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8481_kytka-209.jpg" alt=""><div class="cap">Kytice na míru · růžovo-bílá, 1 500 Kč</div></div>
+
+  <div class="card">
+    <h3>Co a kdy</h3>
+    <div class="kv"><span class="mut">Kytice na míru, růžovo-bílá</span><span>1 500 Kč</span></div>
+    <div class="kv"><span class="mut">Dárková krabice</span><span>150 Kč</span></div>
+    <div class="kv"><span class="mut">Doručení pá 20. 11., 16–18 h</span><span>149 Kč</span></div>
+    <div class="kv total"><span>Celkem vč. DPH</span><span>1 799 Kč</span></div>
+  </div>
+
+  <div class="card" style="border-color:var(--brand-soft)">
+    <h3>Doplňte prosím <span class="pill pink">2 údaje</span></h3>
+    <div class="field"><label>Adresa doručení</label><div class="input" style="color:#B5A5AE">📍 Začněte psát ulici…</div></div>
+    <div class="field"><label>Vzkaz na kartičku (nepovinné)</label><div class="input ta" style="color:#B5A5AE">Vytiskneme na kartičku</div></div>
+    <div class="kv"><span class="mut">Příjemce</span><span>Hana Svobodová · +420 777 123 456 ✓</span></div>
+  </div>
+
+  <div class="card">
+    <button class="apay"> Pay</button>
+    <button class="gpay">G Pay</button>
+    <div class="or">nebo</div>
+    <a class="btn ghost" href="#admin-den">💳 Zaplatit kartou</a>
+    <span class="hint" style="text-align:center">Platbu zpracovává Stripe. Po zaplacení přijde potvrzení SMS a e-mailem. <span class="demo">testovací režim</span></span>
+  </div>
+  <div class="foot">Kytky Plzeň s.r.o., IČO 14273594 · Obchodní podmínky · Ochrana osobních údajů</div>
+</section>
+
+<!-- ============ e) ADMIN: NOVÁ KYTICE ============ -->
+<section class="screen" id="s-admin-nova">
+  <header class="admin-top">
+    <div class="row">
+      <a class="back" href="#admin-den" style="color:#fff">‹ Zrušit</a>
+      <h1>Nová kytice</h1>
+      <span class="pill" style="background:rgba(255,255,255,.2);color:#fff">⏱ cíl 30 s</span>
+    </div>
+  </header>
+  <div style="height:12px"></div>
+  <div class="photo-tile"><img src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8484_kytka-210.jpg" alt=""><div class="ov">📷 Vyfotit znovu · 🖼 Z galerie</div></div>
+
+  <div class="card">
+    <div class="row space">
+      <div class="field" style="flex:1"><label>Cena</label><div class="input bigin">899 <span style="font-size:18px;color:var(--muted)">Kč</span></div></div>
+      <div class="field"><label>Kusů</label><div class="stepper"><button>−</button><span id="qty">2</span><button>+</button></div></div>
+    </div>
+    <div class="field"><label>Prodejna</label><div class="seg" data-group><button class="on">Sedláčkova</button><button>Hamburk</button></div></div>
+    <div class="field"><label>Název (nepovinné, jinak „Kytice 212“)</label><div class="input">Bílé gerbery a hortenzie</div></div>
+  </div>
+
+  <div class="card">
+    <div class="toggle">Prémiová na předobjednávku<button class="sw" aria-label="přepnout"></button></div>
+    <div class="toggle">Zveřejnit hned<button class="sw on" aria-label="přepnout"></button></div>
+    <div class="row" style="gap:8px">
+      <div class="field" style="flex:1"><label>Stáhnout z nabídky</label><div class="input">dnes 18:00</div></div>
+      <div class="field" style="flex:1"><label>Balení</label><div class="input">Výchozí ✓</div></div>
+    </div>
+    <span class="hint">Naposledy: 899 Kč · Sedláčkova · 2 ks. Klepnutím vyplníte stejné hodnoty.</span>
+  </div>
+  <div class="grow"></div>
+  <div class="cta"><a class="btn" href="#admin-den">Zveřejnit ✓</a></div>
+  <nav class="adminnav">
+    <a href="#admin-den"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18"/></svg>Dnes</a>
+    <a class="on" href="#admin-nova"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c2 4 6 5 6 10a6 6 0 0 1-12 0c0-5 4-6 6-10z"/></svg>Nabídka</a>
+    <a class="plus" href="#platba"><span>+</span>IG objednávka</a>
+    <a href="#platba"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>Prodejna</a>
+    <a href="#admin-den"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Více</a>
+  </nav>
+</section>
+
+<!-- ============ f) ADMIN: PŘEHLED DNE ============ -->
+<section class="screen" id="s-admin-den">
+  <header class="admin-top">
+    <div class="row">
+      <button class="iconbtn" aria-label="předchozí den">‹</button>
+      <div style="text-align:center"><h1>Čtvrtek 19. 11.</h1><div class="sub">obě prodejny · 12 objednávek</div></div>
+      <button class="iconbtn" aria-label="další den">›</button>
+    </div>
+  </header>
+  <div class="toast"><span class="pulse"></span>Nová objednávka #2611-044 z webu · 16–18 h<a href="#admin-den">Zobrazit</a></div>
+  <div class="chips" data-group><button class="chip on">Vše</button><button class="chip">Sedláčkova</button><button class="chip">Hamburk</button><button class="chip">Jen rozvoz</button></div>
+  <div class="stat"><div><b>3</b><span>Nové</span></div><div><b>6</b><span>Připravit</span></div><div><b>14 320</b><span>Kč dnes</span></div></div>
+
+  <div class="slot-h">10–12 · hotovo<span class="ln"></span>2</div>
+  <div class="ocard">
+    <div class="hd"><img class="th" src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8487_kytka-211.jpg" alt=""><div class="ti"><b>#2611-039 · Fialové chryzantémy</b><span>Odběr Hamburk · 11:00 · Jana N.</span></div><span class="pill ok">Vyzvednuto</span></div>
+  </div>
+
+  <div class="slot-h">14–16<span class="ln"></span>4</div>
+  <div class="ocard">
+    <div class="hd"><img class="th" src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8475_kytka-207.jpg" alt=""><div class="ti"><b>#2611-041 · Pudrová hortenzie + Raffaello</b><span>🚕 Klatovská tř. 12 · Hana S. · zavolat předem</span></div><span class="pill info">Zaplaceno</span></div>
+    <div class="act"><a class="btn sec-btn" href="#admin-den">🖨 Průvodka</a><a class="btn" href="#admin-den">V přípravě</a><a class="btn ghost" href="#admin-den" aria-label="volat">📞</a></div>
+  </div>
+  <div class="ocard">
+    <div class="hd"><img class="th" src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8481_kytka-209.jpg" alt=""><div class="ti"><b>#2611-042 · Kytice na míru 1 500 Kč</b><span>🚕 Bory, Edvarda Beneše 70 · 📸 IG @hanka.sv</span></div><span class="pill pink">Připravená</span></div>
+    <div class="act"><a class="btn sec-btn" href="#admin-den">🔗 Odkaz řidiči</a><a class="btn" href="#admin-den">Předáno řidiči</a><a class="btn ghost" href="#admin-den" aria-label="volat">📞</a></div>
+  </div>
+  <div class="ocard">
+    <div class="hd"><img class="th" src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8457_kytka-202202.jpg" alt=""><div class="ti"><b>#2611-043 · Červená romantika</b><span>Odběr Sedláčkova · 15:30 · tel. 602 …</span></div><span class="pill warn">Čeká na platbu</span></div>
+    <div class="act"><a class="btn sec-btn" href="#platba">Poslat odkaz znovu</a><a class="btn ghost" href="#admin-den">Zaplatí na místě</a><a class="btn ghost" href="#admin-den" aria-label="volat">📞</a></div>
+  </div>
+
+  <div class="slot-h">16–18<span class="ln"></span>5 · kapacita 6</div>
+  <div class="ocard">
+    <div class="hd"><img class="th" src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8484_kytka-210.jpg" alt=""><div class="ti"><b>#2611-044 · Bílé gerbery a hortenzie</b><span>🚕 Slovany, Koterovská 25 · anonymní odesílatel</span></div><span class="pill danger">Nová</span></div>
+    <div class="act"><a class="btn sec-btn" href="#admin-den">🖨 Průvodka</a><a class="btn" href="#admin-den">Přijmout</a><a class="btn ghost" href="#admin-den" aria-label="volat">📞</a></div>
+  </div>
+  <div class="ocard">
+    <div class="hd"><img class="th" src="https://cdn.myshoptet.com/usr/www.kytkyplzen.com/user/shop/big/8478_kytka-208.jpg" alt=""><div class="ti"><b>#2611-040 · 51 růží (předobjednávka)</b><span>🚕 Doubravka · taxi skutečně 180 Kč / účtováno 199 Kč</span></div><span class="pill ok">Doručeno 17:10</span></div>
+  </div>
+  <div style="height:12px"></div>
+  <nav class="adminnav">
+    <a class="on" href="#admin-den"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18"/></svg>Dnes</a>
+    <a href="#admin-nova"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3c2 4 6 5 6 10a6 6 0 0 1-12 0c0-5 4-6 6-10z"/></svg>Nabídka</a>
+    <a class="plus" href="#platba"><span>+</span>IG objednávka</a>
+    <a href="#platba"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M8 12h8M12 8v8"/></svg>Prodejna</a>
+    <a href="#admin-den"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>Více</a>
+  </nav>
+</section>
+
+</div>
+<p class="note">Náhled je statický: tlačítka přepínají obrazovky a vybrané volby, nic se neukládá. Fotky jsou z aktuálního webu kytkyplzen.com.</p>
+</main>
+
+<script>
+(function(){
+  var ids=['uvod','detail','objednavka','platba','admin-nova','admin-den'];
+  var tabs=document.querySelectorAll('#tabs a');
+  function show(){
+    var h=(location.hash||'#uvod').slice(1); if(ids.indexOf(h)<0) h='uvod';
+    ids.forEach(function(id){ var el=document.getElementById('s-'+id); var on=id===h; el.classList.toggle('on',on); if(on) el.scrollTop=0; });
+    tabs.forEach(function(a){ a.classList.toggle('on',a.getAttribute('href')==='#'+h); if(a.classList.contains('on')) a.scrollIntoView({block:'nearest',inline:'center'}); });
+    if(window.innerWidth<640) window.scrollTo(0,0);
+  }
+  window.addEventListener('hashchange',show); show();
+  var dA=document.getElementById('dA'),dB=document.getElementById('dB'),dn=document.getElementById('dirname');
+  function dir(b){ document.body.classList.toggle('tb',b); dA.classList.toggle('on',!b); dB.classList.toggle('on',b); dn.textContent=b?'Kytky Plzeň · směr B „Ateliér“':'Kytky Plzeň · směr A „Pastel“'; try{localStorage.setItem('dir',b?'b':'a')}catch(e){} }
+  dA.addEventListener('click',function(){dir(false)}); dB.addEventListener('click',function(){dir(true)});
+  try{ if(localStorage.getItem('dir')==='b') dir(true); }catch(e){}
+  // single-choice groups (chips, options, segments)
+  document.querySelectorAll('[data-group]').forEach(function(g){
+    g.addEventListener('click',function(e){
+      var t=e.target.closest('.chip,.opt,.seg button,.addon'); if(!t||!g.contains(t)) return;
+      if(t.classList.contains('off')) return;
+      if(t.classList.contains('addon')){ t.classList.toggle('on'); return; }
+      g.querySelectorAll('.chip,.opt,.seg button').forEach(function(x){ x.classList.remove('on'); });
+      t.classList.add('on');
+    });
+  });
+  document.querySelectorAll('.sw').forEach(function(s){ s.addEventListener('click',function(){ s.classList.toggle('on'); }); });
+  var msg=document.getElementById('msg'), msgc=document.getElementById('msgc');
+  if(msg){ msg.addEventListener('input',function(){ msgc.textContent=msg.value.length; }); }
+  document.querySelectorAll('.stepper').forEach(function(st){ var b=st.querySelectorAll('button'), v=st.querySelector('span');
+    b[0].addEventListener('click',function(){ v.textContent=Math.max(1,+v.textContent-1); });
+    b[1].addEventListener('click',function(){ v.textContent=+v.textContent+1; }); });
+  var tm=document.getElementById('tm'), left=72*60+8;
+  if(tm){ setInterval(function(){ left=Math.max(0,left-1); var h=Math.floor(left/3600),m=Math.floor(left%3600/60),s=left%60; tm.textContent=h+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0'); },1000); }
+})();
+</script>
+
+
+</body>
+</html>

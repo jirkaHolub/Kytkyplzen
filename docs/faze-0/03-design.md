@@ -2,6 +2,10 @@
 
 Klikatelné náhledy (primárně pro mobil, otevřete v telefonu):
 
+**Živě na Vercelu (oba směry, přepínač A/B nahoře):** https://kytkyplzen-nahled.vercel.app
+
+Zdroj nasazené stránky je `docs/faze-0/nahledy/nahled-vercel.html` (fotky načítá z CDN současného webu).
+
 | Směr | Náhled online | Soubor v repozitáři |
 |---|---|---|
 | A „Pastel“ | https://claude.ai/artifact/DJQSncpPNrGMBKV9Dj2PX4 | `docs/faze-0/nahledy/smer-a.html` |
