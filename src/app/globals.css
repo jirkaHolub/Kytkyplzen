@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+/* Směr A „Pastel“: značková růžová na teplé bílé, Nunito + Caveat. */
+@theme {
+  --color-bg: #fffbfd;
+  --color-card: #ffffff;
+  --color-blush: #ffe9f4;
+  --color-blush-2: #ffd6ea;
+  --color-brand: #e06c9f;
+  --color-brand-strong: #c44a84;
+  --color-brand-text: #b23d76;
+  --color-brand-soft: #ff92d5;
+  --color-ink: #2b1e27;
+  --color-muted: #7d6c76;
+  --color-line: #f0dce7;
+  --color-line-2: #e7c9d9;
+  --color-ok: #2e8b57;
+  --color-ok-bg: #e6f5ec;
+  --color-warn: #c27a12;
+  --color-warn-bg: #fff1dc;
+  --color-danger: #d23f5b;
+  --color-danger-bg: #fde7eb;
+  --color-info: #2e5aac;
+  --color-info-bg: #eaf2ff;
+  --font-sans: "Nunito Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-hand: "Caveat", "Segoe Script", cursive;
+  --radius-card: 18px;
+  --radius-field: 14px;
+}
+
+html {
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+  line-height: 1.15;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.safe-bottom {
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-brand-soft);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+  }
+}
